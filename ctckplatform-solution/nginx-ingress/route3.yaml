@@ -1,0 +1,30 @@
+apiVersion: k8s.nginx.org/v1
+kind: VirtualServerRoute
+metadata:
+  name: codepipeline-appv1-tt-com
+  namespace: inner
+spec:
+  subroutes:
+  - path: /
+    splits:
+    - action: 
+        pass: ctcodepipelineadm-5f992cb2f0c02674b0fde002
+      weight: 60
+    - action:
+        pass: ctcodepipelineadm-5f9bd869f50a48abc8095376
+      weight: 40
+#    - action:
+#        pass: cc-5f9bdd30cf254ef1e035a964
+#      weight: 20
+  host: appv1.tt.com
+  ingressClassName: nginx-web-default-1505
+  upstreams:
+  - port: 80
+    service: ctcodepipelineadm-5f992cb2f0c02674b0fde002
+    name: ctcodepipelineadm-5f992cb2f0c02674b0fde002
+  - port: 80
+    service: ctcodepipelineadm-5f9bd869f50a48abc8095376
+    name: ctcodepipelineadm-5f9bd869f50a48abc8095376
+#  - port: 80
+#    service: ctcodepipelineadm-5f9bdd30cf254ef1e035a964
+#    name: cc-5f9bdd30cf254ef1e035a964

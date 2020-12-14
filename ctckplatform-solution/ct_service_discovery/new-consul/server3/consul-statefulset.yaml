@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: consul-server3
+spec:
+  serviceName: consul-server3
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consul-server
+      instance: consul-server3
+  template: 
+    metadata:
+      labels:
+        app: consul-server
+        instance: consul-server3
+    spec:      
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: consul-server
+        image: consul:latest
+        args:
+          - "agent"
+          - "-server"
+          - "-datacenter=dc1"
+          - "-ui"
+          - "-data-dir=/consul/data"
+          - "-node=$(PODIP)"
+          - "-bind=0.0.0.0"
+          - "-client=0.0.0.0"
+          - "-retry-join=consul-server-bootstrap.$(NAMESPACE).svc.cluster.local"
+        env:
+          - name: PODIP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: HOSTIP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        ports:
+          - containerPort: 8500
+            name: ui-port
+          - containerPort: 8400
+            name: alt-port
+          - containerPort: 53
+            name: udp-port
+          - containerPort: 8443
+            name: https-port
+          - containerPort: 8080
+            name: http-port
+          - containerPort: 8301
+            name: serflan
+          - containerPort: 8302
+            name: serfwan
+          - containerPort: 8600
+            name: consuldns
+          - containerPort: 8300
+            name: server

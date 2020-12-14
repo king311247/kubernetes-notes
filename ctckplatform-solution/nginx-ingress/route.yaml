@@ -1,0 +1,24 @@
+apiVersion: k8s.nginx.org/v1
+kind: VirtualServerRoute
+metadata:
+  name: codepipeline
+  namespace: inner
+spec:
+  subroutes:
+  - path: /
+    splits:
+    - action: 
+        pass: ctcodepipelineadm-inner-1-0-0-20101936
+      weight: 60
+    - action:
+        pass: ctcodepipelineadm-inner-1-0-0-20101937
+      weight: 20
+  host: appv1.tt.com
+  ingressClassName: nginx-web-default-1505
+  upstreams:
+  - port: 80
+    service: ctcodepipelineadm-inner-1-0-0-20101936
+    name: ctcodepipelineadm-inner-1-0-0-20101936
+  - port: 80
+    service: ctcodepipelineadm-inner-1-0-0-20101937
+    name: ctcodepipelineadm-inner-1-0-0-20101937

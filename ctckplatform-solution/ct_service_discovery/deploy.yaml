@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-ctcodepipelineadm-inner-1.4.0.20090835
+  labels:
+    app: web-ctcodepipelineadm-inner-1.4.0.20090835
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web-ctcodepipelineadm-inner-1.4.0.20090835
+      app1: web-ctcodepipelineadm-inner-1.4.0.20090835
+  template:
+    metadata:
+      labels:
+        app: web-ctcodepipelineadm-inner-1.4.0.20090835
+        app1: web-ctcodepipelineadm-inner-1.4.0.20090835
+    spec:
+      containers:
+      - name: inner
+        image: dockerhub.uc108.org/backend/web_ctcodepipelineadm_inner:1.4.0.20090835
+        ports:
+        - containerPort: 80
+        env:
+        - name: SERVICE_NAME
+          value: web_ctcodepipelineadm_inner_1_4_0_20090835
+        - name: SERVICE_80_CHECK_TCP
+          value: "true"
+        - name: SERVICE_80_CHECK_INTERVAL
+          value: 15s
+        - name: SERVICE_80_CHECK_TIMEOUT
+          value: 3s
+#      dnsPolicy: Default

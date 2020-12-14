@@ -1,0 +1,15 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-config
+  namespace: nginx-ingress-web-default-1505
+data:
+    stream-snippets: |
+      upstream coredns-udp {
+          server intcylog.tcy365.org:15902;
+      }
+      server {
+          listen 5353 udp;
+          proxy_pass coredns-udp;
+          proxy_responses 1;
+      }

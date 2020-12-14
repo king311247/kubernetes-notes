@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: registrator
+spec:
+  selector:
+    matchLabels:
+      app: registrator
+  template: 
+    metadata:
+      labels:
+        app: registrator
+    spec:      
+      terminationGracePeriodSeconds: 10
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+      - name: registrator
+        image: dockerhub.uc108.org/library/ctk8s-registrator:1.0.0
+        imagePullPolicy: IfNotPresent
+        args:
+             - "-internal=true"
+             - "-resync=120"
+             - "-cleanup"
+             - "-ip=$(HOST_IP)"
+             #- "consul://192.168.56.32:8500"
+             - "consul://127.0.0.1:8500"
+        env:
+            - name: PODIP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+        volumeMounts:
+        - mountPath: "/tmp/docker.sock"
+          name: docker-sock
+          readOnly: true
+      volumes:
+      - name: docker-sock
+        hostPath:
+          path: /var/run/docker.sock

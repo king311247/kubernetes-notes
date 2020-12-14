@@ -1,0 +1,18 @@
+{
+  "kind": "VirtualServer",
+  "spec": {
+    "host": "appv1.tt.com",
+    "routes": [
+      {
+        "route": "inner/web-default-1505-appv1-tt-com-ctcodepipelineadm",
+        "path": "/"
+      }
+    ],
+    "ingressClassName": "nginx-web-default-1505"
+  },
+  "apiVersion": "k8s.nginx.org/v1",
+  "metadata": {
+    "name": "web-default-1505-appv1-tt-com",
+    "namespace": "inner"
+  }
+}

@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config-alert-rules
+  namespace: monitor
+data:
+  alert-rules.yaml: |
+    groups:
+    - name: netcoreContainer
+      rules:
+      - alert: CpuUsage
+        expr: sum(irate(container_cpu_usage_seconds_total{container !="",container!="POD"}[2m])) by (namespace,container, pod) / (sum(container_spec_cpu_quota{container !="",container!="POD"} >0 /100000) by (namespace,container, pod)) * 100 > 0.7
+        for: 1m
+        labels:
+          severity: warning,
+          group: netcoreContainer
+        annotations:
+          env: "{{ $labels.namespace }}"
+          service: "{{ $labels.container }}"
+          value: "{{ $value }}"
+      - alert: MemoryUsage
+        expr: sum (container_memory_working_set_bytes{container !="",container!="POD"}) by (namespace,container, pod)/ sum(container_spec_memory_limit_bytes{container !="",container!="POD"} >0 ) by (namespace,container, pod) > 0.7
+        for: 1m
+        labels:
+          severity: warning
+          group: netcoreContainer
+        annotations:
+          env: "{{ $labels.namespace }}"
+          service: "{{ $labels.container }}"
+          value: "{{ $value }}"
+    - name: netcoreReplicas
+      rules:
+      - alert: ReplicasAbnormal
+        expr: (kube_deployment_status_replicas_available / (kube_deployment_status_replicas > 0)) < 1
+        for: 1m
+        labels:
+          severity: warning
+          group: netcoreReplicas
+        annotations:
+          env: "{{ $labels.namespace }}"
+          deployment: "{{ $labels.deployment }}"
+          value: "{{ $value }}"
+      - alert: ReplicasUnavailable
+        expr: (kube_deployment_status_replicas_available / (kube_deployment_status_replicas > 0)) == 0 and kube_deployment_spec_replicas >0
+        for: 10s
+        labels:
+          severity: warning
+          group: netcoreReplicas
+        annotations:
+          env: "{{ $labels.namespace }}"
+          deployment: "{{ $labels.deployment }}"
+          value: "{{ $value }}"

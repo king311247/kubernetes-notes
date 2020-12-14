@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: web-ctcodepipelineadm-inner
+  annotations:
+    kubernetes.io/ingress.class: "nginx-web-2505"
+spec:
+  rules:
+  - host: appv1.tt.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: web-ctcodepipelineadm-inner
+          servicePort: 80

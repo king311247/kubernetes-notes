@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-ctcodepipelineadm-inner-1.4.0.20090835
+  labels:
+    app: web-ctcodepipelineadm-inner-1.4.0.20090835
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-ctcodepipelineadm-inner-1.4.0.20090835
+      app1: web-ctcodepipelineadm-inner-1.4.0.20090835
+  template:
+    metadata:
+      labels:
+        app: web-ctcodepipelineadm-inner-1.4.0.20090835
+        app1: web-ctcodepipelineadm-inner-1.4.0.20090835
+    spec:
+      containers:
+      - name: inner
+        image: dockerhub.uc108.org/backend/web_ctcodepipelineadm_inner:1.4.0.20090835
+        ports:
+        - containerPort: 80
+        env:
+        - name: SERVICE_NAME
+          value: web_cfpromotionapi_inner_3_0_1_20041519
+#      dnsPolicy: Default

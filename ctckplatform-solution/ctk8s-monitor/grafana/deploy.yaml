@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: grafana
+  namespace: monitor
+  labels:
+    name: grafana
+spec:
+  selector:
+    matchLabels:
+      name: grafana
+  serviceName: "grafana"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: grafana
+    spec:
+      containers:
+      - name: grafana
+        image: grafana/grafana:7.3.4
+        ports:
+        - containerPort: 3000
+          hostPort: 3030
+        resources:
+          requests:
+            cpu: 0.15
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/grafana
+        - name: log
+          mountPath: /var/log/grafana
+        - name: defaults-config
+          mountPath: /usr/share/grafana/conf/defaults.ini
+      volumes:
+        - name: data
+          hostPath:
+            path: /data/grafana/data
+        - name: log
+          hostPath:
+            path: /data/grafana/log
+        - name: defaults-config
+          hostPath:
+            # 确保配置文件存在
+            type: File
+            path: /data/grafana/conf/defaults.ini

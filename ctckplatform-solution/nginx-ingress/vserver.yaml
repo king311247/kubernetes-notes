@@ -1,0 +1,10 @@
+apiVersion: k8s.nginx.org/v1
+kind: VirtualServer
+metadata:
+  name: codepipeline-aa-appv1-tt-com
+  namespace: inner
+spec:
+  host: appv1.tt.com
+  routes:
+  - path: /
+    route: inner/codepipeline-appv1-tt-com

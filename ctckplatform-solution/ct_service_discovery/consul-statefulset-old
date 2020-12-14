@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: consul
+spec:
+  serviceName: consul
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consul
+  template: 
+    metadata:
+      labels:
+        app: consul
+    spec:      
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: consul
+        image: dockerhub.uc108.org/library/ct-consul:1.0.0
+        args:
+             - "agent"
+             - "-server"
+             - "-bootstrap-expect=1"
+             - "-data-dir=/consul/data"
+             - "-client=0.0.0.0"
+             - "-node=$(HOST_IP)"
+             - "-ui"
+        env:
+            - name: PODIP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: SERVICE_IGNORE
+              value: "true"
+            #- name: CONSUL_LOCAL_CONFIG
+            #  value: "{\"acl_datacenter\": \"dc1\",\"node_name\":\"$(HOST_IP)\",\"client_addr\": \"0.0.0.0\",\"ui\":true}"
+        ports:
+            - containerPort: 8300
+              hostPort: 8300
+            - containerPort: 8301
+              hostPort: 8301
+            - containerPort: 8302
+              hostPort: 8302
+            - containerPort: 8500
+              hostPort: 8500
+            - containerPort: 8600
+              hostPort: 8600
+        volumeMounts:
+        - mountPath: "/consul/data"
+          name: consul-data
+      volumes:
+      - name: consul-data
+        emptyDir: {}

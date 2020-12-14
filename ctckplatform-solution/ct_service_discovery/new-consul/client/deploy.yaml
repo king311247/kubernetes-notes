@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: consul-client
+spec:
+  selector:
+    matchLabels:
+      app: consul-client
+  template: 
+    metadata:
+      labels:
+        app: consul-client
+    spec:      
+      containers:
+      - name: consul-client
+        image: consul:latest
+        imagePullPolicy: IfNotPresent
+        args:
+             - "agent"
+             - "-node=client-$(HOSTIP)"
+             - "-client=0.0.0.0"
+             - "-bind=0.0.0.0"
+             - "-retry-join=consul-server.$(NAMESPACE).svc.cluster.local"
+        env:
+            - name: PODIP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: HOSTIP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+        ports:
+          - containerPort: 8500
+            hostPort: 8500
+            name: ui-port

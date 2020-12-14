@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: web5
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: web5
+  template:
+    metadata:
+      labels:
+        app: web5
+    spec:
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      containers:
+      - image: dockerhub.uc108.org/library/ct-nginx-consul-template:6.2.9
+        imagePullPolicy: IfNotPresent
+        name: nginx
+        ports:
+        - name: http80
+          containerPort: 80
+        - name: http2505
+          containerPort: 2505
+        - name: http1505
+          containerPort: 1505
+        - name: http1506
+          containerPort: 1506
+        - name: http1507
+          containerPort: 1507
+        env:
+        - name: CONSUL_URL
+          #value: 192.168.56.32:8500
+          value: "127.0.0.1:8500"
+        - name: HOSTIP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: GROUP
+          value: "5fc4b11c120a40e1bae5053f"
+        args:
+         #- -v=3 # Enables extensive logging. Useful for troubleshooting.
+         #- -report-ingress-status
+         #- -external-service=nginx-ingress
+         #- -enable-prometheus-metrics
+         #- -global-configuration=$(POD_NAMESPACE)/nginx-configuration
+      nodeSelector:
+        ct.k8s/ingress-controller: "ingress-nginx"

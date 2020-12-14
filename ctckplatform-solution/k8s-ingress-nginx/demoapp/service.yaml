@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: web-ctcodepipelineadm-inner-1.4.0.20090835
+  name: web-ctcodepipelineadm-inner
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: web-ctcodepipelineadm-inner-1.4.0.20090835
+status:
+  loadBalancer: {}
